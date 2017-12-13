@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('');
+defined('BASEPATH') OR exit('Direct Access Denied');
 ?>
 
 <!DOCTYPE HTML>
@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('');
         <title><?= $pageTitle ?></title>
 		
         <!-- Favicon -->
-        <link rel="shortcut icon" href="<?=base_url()?>assets/images/icon.ico">
+        <link rel="shortcut icon" href="<?=base_url()?>assets/images/lola-icon.png">
         <!-- favicon ends -->
 
         <link rel="stylesheet" href="<?=base_url()?>assets/css/bootstrap.min.css">
@@ -27,3 +27,6 @@ defined('BASEPATH') OR exit('');
 
         <!-- custom JS -->
         <script src="<?= base_url() ?>assets/js/main.js"></script>
+        
+    </head>
+    <body>
