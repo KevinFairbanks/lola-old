@@ -1,7 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
  
-use \DTS\eBaySDK\Shopping\Services;
-use \DTS\eBaySDK\Shopping\Types;
+use \DTS\eBaySDK\Constants;
+use \DTS\eBaySDK\Trading\Services;
+use \DTS\eBaySDK\Trading\Types;
+use \DTS\eBaySDK\Trading\Enums;
 
 class Main extends CI_Controller {
  
@@ -16,19 +18,31 @@ class Main extends CI_Controller {
         
         $this->load->template('body');
         
-        $service = new Services\ShoppingService();
-        $request = new Types\GetCategoryInfoRequestType();
+        $service = new Services\TradingService([
+            'credentials' => [
+                'devId'  => EBAY_SDK_DEV_ID,
+                'appId'  => EBAY_SDK_APP_ID,
+                'certId' => EBAY_SDK_CERT_ID
+            ],
+            'siteId' => Constants\SiteIds::US
+        ]);
+        $request = new Types\GetCategoriesRequestType();
         
-        $request->CategoryID = '-1';
-        $request->IncludeSelector = 'ChildCategories';
+        $request->DetailLevel = ['ReturnAll'];
+        $request->OutputSelector = [
+            'CategoryArray.Category.CategoryID',
+            'CategoryArray.Category.CategoryParentID',
+            'CategoryArray.Category.CategoryLevel',
+            'CategoryArray.Category.CategoryName'
+        ];
 
-        $response = $service->getCategoryInfo($request);
+        $response = $service->getCategories($request);
         
         if (isset($response->Errors)) {
             foreach ($response->Errors as $error) {
                 printf(
                     "%s: %s\n%s\n\n",
-                    $error->SeverityCode === DTS\eBaySDK\Shopping\Enums\SeverityCodeType::C_ERROR ? 'Error' : 'Warning',
+                    $error->SeverityCode === Enums\SeverityCodeType::C_ERROR ? 'Error' : 'Warning',
                     $error->ShortMessage,
                     $error->LongMessage
                 );
@@ -37,9 +51,11 @@ class Main extends CI_Controller {
         if ($response->Ack !== 'Failure') {
             foreach ($response->CategoryArray->Category as $category) {
                 printf(
-                    "Category (%s) %s\n",
+                    "Level %s : %s (%s) : Parent %s\n",
+                    $category->CategoryLevel,
+                    $category->CategoryName,
                     $category->CategoryID,
-                    $category->CategoryName
+                    $category->CategoryParentID[0]
                 );
             }
         }
